@@ -2,9 +2,30 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
+
+
+
+/**
+ * 
+ * 
+ * 
+ * 
+    1. get all students that have passed Math with a passing grade of 50 or above.
+    2. get all students that have failed Science
+    3. get list of students grouped by student id + highest graded course
+ * 
+ * 
+ * 
+ * 
+ **/
+
+
+
+
 namespace Graduation.BAL
 {
     using System;
+    using System.Collections.Generic;
     using Graduation.Models;
     using Graduation.Repository;
     using Graduation.Utilities;
@@ -127,6 +148,91 @@ namespace Graduation.BAL
             {
                 return STANDING.None;
             }
+        }
+        /// <summary>
+        ///   1. get all students that have passed Math with a passing grade of 50 or above.
+        /// </summary>
+        /// <param name="passingMark">default 50 but in case it changes let us make it easy by passing</param>
+        private List<Student> GetListOfStudentPassedInMath(int passingMark = 50)
+        {
+            List<Student> passedStudents = new List<Student>();
+            //List<Student> allStudents = new List<Student>();
+            var allStudents = Repository.GetStudents();
+            foreach (Student eachStudent in allStudents)
+            {
+                foreach (Course eachCourse in eachStudent.Courses)
+                {
+                    if (eachCourse.Name == "Math" && eachCourse.Mark >= passingMark)
+                    {
+                        passedStudents.Add(eachStudent);
+                    }
+                }
+
+            }
+            return passedStudents;
+        }
+
+        /// <summary>
+        ///   1. get all students that have failed science.
+        /// </summary>
+        /// <param name="passingMark">default 50 but in case it changes let us make it easy by passing</param>
+        private List<Student> GetListOfStudentFailedInSceince(int passingMark = 50)
+        {
+            List<Student> failedStudents = new List<Student>();
+            //List<Student> allStudents = new List<Student>();
+            var allStudents = Repository.GetStudents();
+            foreach (Student eachStudent in allStudents)
+            {
+                foreach (Course eachCourse in eachStudent.Courses)
+                {
+                    if (eachCourse.Name == "Science" && eachCourse.Mark < passingMark)
+                    {
+                        failedStudents.Add(eachStudent);
+                    }
+                }
+
+            }
+            return failedStudents;
+        }
+
+
+        /// <summary>
+        ///  get list of students grouped by student id + highest graded course
+        /// </summary>
+        private List<Student> GetListOfStudentWithHighestGradeCourses()
+        {
+            List<Student> StudentWithHighestGradeCourse = new List<Student>();
+            //List<Student> allStudents = new List<Student>();
+            int latestMaxMark = 0;
+            Course highestGradeCourse = new Course();
+            var allStudents = Repository.GetStudents();
+            foreach (Student eachStudent in allStudents)
+            {
+                //eachStudent.Courses.
+                foreach (Course eachCourse in eachStudent.Courses)
+                {
+                    if (latestMaxMark < eachCourse.Mark)
+                    {
+                        latestMaxMark = eachCourse.Mark;
+                        highestGradeCourse = eachCourse;
+                    }
+                }
+                StudentWithHighestGradeCourse.Add(new Student
+                {
+                    Id = eachStudent.Id,
+                    Courses = new Course[]
+                    {
+                        new Course
+                        {
+                            Id = highestGradeCourse.Id,
+                            Mark = highestGradeCourse.Mark,
+                            Name = highestGradeCourse.Name
+                        }
+                    }
+                }
+                );
+            }
+            return StudentWithHighestGradeCourse;
         }
     }
 }
